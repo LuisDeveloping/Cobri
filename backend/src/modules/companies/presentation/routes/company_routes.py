@@ -11,7 +11,6 @@ from src.modules.companies.application.use_cases.commands.company_command import
 from src.modules.companies.application.use_cases.queries.company_query import get_company_by_id
 from src.modules.companies.application.use_cases.queries.company_query import get_all_companies
 
-
 router = APIRouter(prefix="/companies", tags=["Companies"])
 
 # POST/companies/Create Company Route
@@ -58,6 +57,7 @@ def get_all_companies_route(
     companies = get_all_companies(repository=repository)
     return companies
 
+# PUT/companies/{company_id}/Update Company Route
 @router.put("/{company_id}", response_model=CompanyResponse)
 def update_company_route(
     company_id: str,
@@ -78,6 +78,7 @@ def update_company_route(
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
+# DELETE/companies/{company_id}/Delete Company Route
 @router.delete("/{company_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_company_route(
     company_id: str,

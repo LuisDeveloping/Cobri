@@ -5,6 +5,7 @@ from src.core.database.session import engine
 from src.core.database.session import Base
 from src.modules.companies.infrastructure.database.models.company_model import CompanyModel
 from src.modules.companies.presentation.routes.company_routes import router as company_router
+from src.modules.users.presentation.routes.user_routes import router as user_router
 
 app = FastAPI()
 
@@ -24,4 +25,8 @@ def test_db():
 def create_tables():
     Base.metadata.create_all(bind=engine)
 
+# Companies Routers
 app.include_router(company_router)
+
+# Users Routers
+app.include_router(user_router)
