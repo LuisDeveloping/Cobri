@@ -6,6 +6,7 @@ from src.core.database.session import Base
 from src.modules.companies.infrastructure.database.models.company_model import CompanyModel
 from src.modules.companies.presentation.routes.company_routes import router as company_router
 from src.modules.users.presentation.routes.user_routes import router as user_router
+from src.modules.clients.presentation.routes.client_routes import router as client_router
 
 app = FastAPI()
 
@@ -30,3 +31,6 @@ app.include_router(company_router)
 
 # Users Routers
 app.include_router(user_router)
+
+# Clients Routers
+app.include_router(client_router)
