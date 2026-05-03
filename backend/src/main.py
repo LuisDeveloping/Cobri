@@ -1,12 +1,16 @@
 from fastapi import FastAPI
+
 from src.core.config import settings
 from src.core.database.session import engine
 from src.core.database.session import engine
 from src.core.database.session import Base
+
 from src.modules.companies.infrastructure.database.models.company_model import CompanyModel
 from src.modules.companies.presentation.routes.company_routes import router as company_router
 from src.modules.users.presentation.routes.user_routes import router as user_router
 from src.modules.clients.presentation.routes.client_routes import router as client_router
+from src.modules.charges.presentation.routes.charge_routes import router as charge_router
+from src.modules.payments.presentation.routes.payment_routes import router as payment_router
 
 app = FastAPI()
 
@@ -34,3 +38,9 @@ app.include_router(user_router)
 
 # Clients Routers
 app.include_router(client_router)
+
+# Charge Routers
+app.include_router(charge_router)
+
+# Payment Routers
+app.include_router(payment_router)

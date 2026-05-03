@@ -17,6 +17,44 @@ from src.modules.charges.presentation.schemas.charge_schema import (CreateCharge
 
 router = APIRouter(prefix="/charges", tags=["Charges"])
 
+# GET/charges/Get Charges Route
+@router.get("/", response_model=List[ChargeResponse])
+def get_charges_route(
+    status: Optional[str] = None,
+    client_id: Optional[uuid.UUID] = None,
+    from_date: Optional[datetime] = None,
+    to_date: Optional[datetime] = None,
+    repository=Depends(get_charge_repository),
+    current_user=Depends(get_current_user),
+):
+    return get_charges(
+        repository=repository,
+        company_id=current_user.company_id,
+        status=status,
+        client_id=client_id,
+        from_date=from_date,
+        to_date=to_date,
+    )
+
+# GET/charges/Get Charge By Id Route
+@router.get("/{charge_id}", response_model=ChargeResponse)
+def get_charge_by_id_route(
+    charge_id: uuid.UUID,
+    repository=Depends(get_charge_repository),
+    current_user=Depends(get_current_user),
+):
+    charge = get_charge_by_id(
+        repository=repository,
+        charge_id=charge_id,
+        company_id=current_user.company_id,
+    )
+
+    if not charge:
+        raise HTTPException(status_code=404, detail="Cobro no encontrado")
+
+    return charge
+
+# POST/charges/Create Charge Route
 @router.post("/", response_model=ChargeResponse)
 def create_charge_route(
     request: CreateChargeRequest,
@@ -49,41 +87,7 @@ def create_charge_route(
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-@router.get("/", response_model=List[ChargeResponse])
-def get_charges_route(
-    status: Optional[str] = None,
-    client_id: Optional[uuid.UUID] = None,
-    from_date: Optional[datetime] = None,
-    to_date: Optional[datetime] = None,
-    repository=Depends(get_charge_repository),
-    current_user=Depends(get_current_user),
-):
-    return get_charges(
-        repository=repository,
-        company_id=current_user.company_id,
-        status=status,
-        client_id=client_id,
-        from_date=from_date,
-        to_date=to_date,
-    )
-
-@router.get("/{charge_id}", response_model=ChargeResponse)
-def get_charge_by_id_route(
-    charge_id: uuid.UUID,
-    repository=Depends(get_charge_repository),
-    current_user=Depends(get_current_user),
-):
-    charge = get_charge_by_id(
-        repository=repository,
-        charge_id=charge_id,
-        company_id=current_user.company_id,
-    )
-
-    if not charge:
-        raise HTTPException(status_code=404, detail="Cobro no encontrado")
-
-    return charge
-
+# PUT/charges/Update Charges Route
 @router.put("/{charge_id}", response_model=ChargeResponse)
 def update_charge_route(
     charge_id: uuid.UUID,
@@ -113,6 +117,7 @@ def update_charge_route(
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
+# DELETE/charges/Cancel Charge Route
 @router.delete("/{charge_id}", status_code=204)
 def cancel_charge_route(
     charge_id: uuid.UUID,

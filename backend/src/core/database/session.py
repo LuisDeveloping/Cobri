@@ -12,7 +12,9 @@ class Base(DeclarativeBase):
 # Crear engine (Es la conexión a PostgreSQL)
 engine = create_engine(
     settings.database_url,
-    echo=True  # 👈 luego lo quitamos en producción
+    echo=True,  # luego lo quitamos en producción
+    pool_pre_ping=True,   # verifica conexiones antes de usarlas
+    pool_recycle=300,     # evita conexiones muertas (5 min)
 )
 
 
