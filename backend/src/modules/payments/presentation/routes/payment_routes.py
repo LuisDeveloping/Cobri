@@ -9,6 +9,7 @@ from src.core.dependecies.charge_dependencies import get_charge_repository
 from src.core.dependecies.auth_dependencies import get_current_user
 from src.core.dependecies.role_dependencies import require_roles
 from src.core.dependecies.audit_dependencies import get_audit_repository
+from src.core.dependecies.notification_dependencies import get_notification_repository
 
 from src.modules.payments.application.use_cases.commands.payment_command import (
     create_payment,
@@ -31,6 +32,7 @@ def create_payment_route(
     request: CreatePaymentRequest,
     repository=Depends(get_payment_repository),
     charge_repository=Depends(get_charge_repository),
+    notification_repository=Depends(get_notification_repository),
     audit_repo=Depends(get_audit_repository),
     current_user=Depends(require_roles(["admin", "owner"])),
 ):
@@ -38,6 +40,7 @@ def create_payment_route(
         payment = create_payment(
             repository=repository,
             charge_repository=charge_repository,
+            notification_repository=notification_repository, 
             charge_id=request.charge_id,
             amount=request.amount,
             payment_method=request.payment_method,

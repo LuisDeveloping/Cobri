@@ -4,10 +4,14 @@ import uuid
 from src.modules.payments.domain.entities.payment_entity import Payment
 from src.modules.payments.domain.interfaces.payment_repository import PaymentRepository
 from src.modules.charges.domain.interfaces.charge_repository import ChargeRepository
+from src.modules.notifications.domain.interfaces.notification_repository import NotificationRepository
+from src.modules.notifications.domain.entities.notification_entity import Notification
+
 
 def create_payment(
     repository: PaymentRepository,
     charge_repository: ChargeRepository,
+    notification_repository: NotificationRepository,
     charge_id: uuid.UUID,
     amount: float,
     payment_method: str,
@@ -47,10 +51,27 @@ def create_payment(
     # guardar pago
     saved_payment = repository.create(payment)
 
-    # recalcular total actualizado
+    # =========================
+    # CREAR NOTIFICACIÓN
+    # =========================
+    message = f"Se ha recibido un pago de ₡{amount}"
+
+    notification = Notification(
+        company_id=company_id,
+        client_id=charge.client_id,
+        charge_id=charge.id,
+        type="payment_received",
+        message=message,
+        channel="internal",
+    )
+
+    notification_repository.create(notification)
+
+    # =========================
+    # ACTUALIZAR CHARGE
+    # =========================
     new_total = total_paid + amount
 
-    # actualizar estado del charge (DOMINIO)
     if new_total == 0:
         charge.status = "pending"
     elif new_total < charge.amount:
@@ -60,10 +81,10 @@ def create_payment(
 
     charge.updated_at = datetime.utcnow()
 
-    # guardar charge
     charge_repository.update(charge)
 
     return saved_payment
+
 
 def void_payment(
     repository: PaymentRepository,
@@ -81,7 +102,6 @@ def void_payment(
     # anular (dominio)
     payment.void(reason)
 
-    # guardar pago
     repository.update(payment)
 
     # obtener charge
@@ -99,7 +119,7 @@ def void_payment(
         company_id=company_id,
     )
 
-    # actualizar estado del charge
+    # actualizar estado
     if total_paid == 0:
         charge.status = "pending"
     elif total_paid < charge.amount:
@@ -109,7 +129,6 @@ def void_payment(
 
     charge.updated_at = datetime.utcnow()
 
-    # guardar
     charge_repository.update(charge)
 
     return payment

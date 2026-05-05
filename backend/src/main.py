@@ -11,6 +11,7 @@ from src.modules.users.presentation.routes.user_routes import router as user_rou
 from src.modules.clients.presentation.routes.client_routes import router as client_router
 from src.modules.charges.presentation.routes.charge_routes import router as charge_router
 from src.modules.payments.presentation.routes.payment_routes import router as payment_router
+from src.modules.notifications.presentation.routes.notification_routes import router as notification_router
 
 app = FastAPI()
 
@@ -44,3 +45,6 @@ app.include_router(charge_router)
 
 # Payment Routers
 app.include_router(payment_router)
+
+# Notification Routers
+app.include_router(notification_router)
